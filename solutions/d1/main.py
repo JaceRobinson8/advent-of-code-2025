@@ -1,43 +1,44 @@
+from __future__ import annotations
 from pathlib import Path
 from functools import reduce
 from dataclasses import dataclass
+
 
 BASE_DIR = Path(__file__).resolve().parent
 DIAL_MAX = 100
 
 
+@dataclass(frozen=True)
 class Rotation:
     value: int
 
-    def __init__(self, rotation: str):
-        amount = int(rotation[1:-1])
-        self.value = amount if rotation[0] == "R" else -amount
-
-    def __str__(self) -> str:
-        self.value
+    @classmethod
+    def from_str(cls, rotation: str) -> Rotation:
+        amount = int(rotation[1:])
+        return cls(amount if rotation[0] == "R" else -amount)
 
 
-@dataclass
-class Result:
+@dataclass(frozen=False)
+class ZeroCounter:
     dial: int
     zero_count: int
 
 
 def parse_file(file_path: str | Path) -> list[Rotation]:
+    file_path = Path(file_path)
     with open(file=file_path, mode="r") as f:
-        return [Rotation(row) for row in f.readlines()]
+        return [Rotation.from_str(line.strip()) for line in f if line.strip()]
 
 
-def apply_rotation(res: Result, rot: Rotation) -> Result:
-    res.dial = (res.dial + rot.value) % DIAL_MAX  # apply rotation
-    res.zero_count += 1 if res.dial == 0 else 0  # count zeros
-    return res
+def apply_rotation(cur: ZeroCounter, rot: Rotation) -> ZeroCounter:
+    new_dial = (cur.dial + rot.value) % DIAL_MAX  # apply rotation
+    new_zero_count = cur.zero_count + (cur.dial == 0)  # count zeros
+    return ZeroCounter(new_dial, new_zero_count)
 
 
 # part 1
-def count_0s_p1(rotations: list[Rotation], dial: int = 50) -> int:
-    res = reduce(apply_rotation, rotations, Result(dial, 0))
-    return res.zero_count
+def count_0s_p1(rotations: list[Rotation], dial_start: int = 50) -> int:
+    return reduce(apply_rotation, rotations, ZeroCounter(dial_start, 0)).zero_count
 
 
 # part 2
