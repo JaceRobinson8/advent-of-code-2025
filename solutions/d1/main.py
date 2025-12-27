@@ -2,6 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 from functools import reduce
 from dataclasses import dataclass
+import time
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -84,8 +85,19 @@ def count_0s_p2(rotations: list[Rotation]) -> int:
 
 def p1():
     rotations = parse_file(BASE_DIR / "input1.txt")
-    # print(f"Answer: {count_0s_p1_reduction(rotations=rotations)}")
-    print(f"Answer: {count_0s_p1_loop(rotations=rotations)}")
+    start = time.perf_counter()
+    result = count_0s_p1_reduction(rotations=rotations)
+    elapsed = time.perf_counter() - start
+    print(f"Reduction sol time: {elapsed}")
+
+    # For loop is faster and simplier!
+    start = time.perf_counter()
+    result = count_0s_p1_loop(rotations=rotations)
+    elapsed = time.perf_counter() - start
+    print(f"Loop sol time: {elapsed}")
+
+    print(f"Answer (reduction): {count_0s_p1_reduction(rotations=rotations)}")
+    print(f"Answer (loop): {count_0s_p1_loop(rotations=rotations)}")
     # print(f"Answer: {count_0s_p2(rotations=rotations)}")
 
 
