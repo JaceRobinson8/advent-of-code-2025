@@ -37,8 +37,23 @@ def apply_rotation(cur: ZeroCounter, rot: Rotation) -> ZeroCounter:
 
 
 # part 1
-def count_0s_p1(rotations: list[Rotation], dial_start: int = 50) -> int:
+# Reduction solution
+def count_0s_p1_reduction(rotations: list[Rotation], dial_start: int = 50) -> int:
     return reduce(apply_rotation, rotations, ZeroCounter(dial_start, 0)).zero_count
+
+
+# part 1
+# for loop
+def count_0s_p1_loop(rotations: list[Rotation], dial_start: int = 50) -> int:
+    # Initial state
+    dial = dial_start
+    zero_count = 0
+    # Apply rotations, counting zeros
+    for rot in rotations:
+        dial = (dial + rot.value) % DIAL_MAX
+        if dial == 0:  # zero found
+            zero_count += 1
+    return zero_count
 
 
 # part 2
@@ -69,7 +84,8 @@ def count_0s_p2(rotations: list[Rotation]) -> int:
 
 def p1():
     rotations = parse_file(BASE_DIR / "input1.txt")
-    print(f"Answer: {count_0s_p1(rotations=rotations)}")
+    # print(f"Answer: {count_0s_p1_reduction(rotations=rotations)}")
+    print(f"Answer: {count_0s_p1_loop(rotations=rotations)}")
     # print(f"Answer: {count_0s_p2(rotations=rotations)}")
 
 
