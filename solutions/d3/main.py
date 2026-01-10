@@ -12,26 +12,7 @@ class Bank:
         return cls([int(x) for x in batteries])
 
 
-def get_bank_joltage_rearrange(bank: Bank) -> int:
-    # I misread the problem, in this solution you can rearrange batteries
-    (
-        max_index,
-        max_val,
-    ) = max(enumerate(bank.batteries), key=lambda x: x[1])
-    bank.batteries.remove(max_val)
-    # Second largest values
-    (
-        max2_index,
-        max2_val,
-    ) = max(enumerate(bank.batteries), key=lambda x: x[1])
-    if max_index <= max2_index:
-        bank_joltage = int(str(max_val) + str(max2_val))
-    else:
-        bank_joltage = int(str(max2_val) + str(max_val))
-    return bank_joltage
-
-
-def get_bank_joltage(bank: Bank) -> int:
+def get_bank_joltage_p1(bank: Bank) -> int:
     # First get max value.
     # Then get max value to right of previous max
     # This produces the largest joltage
@@ -43,6 +24,29 @@ def get_bank_joltage(bank: Bank) -> int:
     return int(str(max_val) + str(max2_val))
 
 
+def get_bank_joltage_p2(bank: Bank, batteries_to_turn_on: int) -> int:
+    batteries = []
+    max_idx = -1
+    total_batteries = len(bank.batteries)
+    for idx in range(batteries_to_turn_on):
+        max_idx, max_val = get_max_battery_in_slice(
+            bank.batteries,
+            range_start=max_idx + 1,
+            range_end=total_batteries - batteries_to_turn_on + idx + 1,
+        )
+        batteries.append(str(max_val))
+    return int("".join(batteries))
+
+
+def get_max_battery_in_slice(
+    batteries: list[int], range_start: int, range_end: int
+) -> tuple[int, int]:
+    return max(
+        enumerate(batteries[range_start:range_end]),
+        key=lambda x: x[1],
+    )
+
+
 def parse_file(file_path: str | Path) -> list[Bank]:
     file_path = Path(file_path)
     with open(file=file_path, mode="r") as f:
@@ -51,9 +55,9 @@ def parse_file(file_path: str | Path) -> list[Bank]:
 
 def main():
     BASE_DIR = Path(__file__).resolve().parent
-    banks = parse_file(BASE_DIR / "input1.txt")
-    print(f"Answer (p1): {sum([get_bank_joltage(bank) for bank in banks])}")
-    # print(f"Answer (p2): {sum(get_invalid_idx_from_ranges(idx_ranges, -1))}")
+    banks = parse_file(BASE_DIR / "input_sample.txt")
+    print(f"Answer (p1): {sum([get_bank_joltage_p1(bank) for bank in banks])}")
+    print(f"Answer (p2): {sum([get_bank_joltage_p2(bank, 12) for bank in banks])}")
 
 
 if __name__ == "__main__":
